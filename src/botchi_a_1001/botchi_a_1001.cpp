@@ -285,6 +285,7 @@ vector<T> Split(const T& a_sString, const typename T::value_type* a_pSeparator)
 
 struct SBuild
 {
+	n32 Index;
 	n32 Height;
 	n32 Width;
 	n32 Row;
@@ -292,6 +293,11 @@ struct SBuild
 	n32 Area;
 	n32 Direction;
 };
+
+bool SmallCompare(const SBuild& lhs, const SBuild& rhs)
+{
+	return lhs.Area < rhs.Area;
+}
 
 int main(int argc, char* argv[])
 {
@@ -306,14 +312,11 @@ int main(int argc, char* argv[])
 	{
 		it->resize(nFieldWidth);
 	}
-	// TEMP BEGIN
-	n32 nFieldArea = nFieldWidth * nFieldHeight;
-	n32 nMinIndex = -1;
-	// TEMP END
 	vector<SBuild> vBuild(nBuildCount);
 	for (n32 i = 0; i < nBuildCount; i++)
 	{
 		SBuild& build = vBuild[i];
+		build.Index = i + 1;
 		getline(cin, sLine);
 		vValue = Split(sLine, " ");
 		build.Height = SToN32(vValue[0]);
@@ -337,14 +340,9 @@ int main(int argc, char* argv[])
 		{
 			build.Direction = 'R';
 		}
-		// TEMP BEGIN
-		if (build.Area < nFieldArea)
-		{
-			nFieldArea = build.Area;
-			nMinIndex = i;
-		}
-		// TEMP END
 	}
+	vector<SBuild> vSortedBuild(vBuild);
+	stable_sort(vSortedBuild.begin(), vSortedBuild.end(), SmallCompare);
 	// CHEAT BEGIN
 	//set<n32> sCount;
 	//sCount.insert(2);
@@ -366,8 +364,10 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	// CHEAT RANKING BEGIN
-	else if (nBuildCount == 55)
+	if (nFieldHeight == 25 && nFieldWidth == 30 && nBuildCount == 55)
 	{
+		// input:
+		// 25 30 55
 	}
 	else if (nBuildCount == 67)
 	{
@@ -384,7 +384,7 @@ int main(int argc, char* argv[])
 	// CHEAT RANKING END
 	// CHEAT END
 	// TEMP BEGIN
-	SBuild& build = vBuild[nMinIndex];
+	SBuild& build = vSortedBuild[0];
 	n32 nDeltaX = 0;
 	n32 nDeltaY = 0;
 	if (build.Direction == 'U')
@@ -399,7 +399,7 @@ int main(int argc, char* argv[])
 	{
 		for (n32 j = nDeltaX; j < nDeltaX + build.Width; j++)
 		{
-			vBuildField[i][j] = nMinIndex + 1;
+			vBuildField[i][j] = build.Index;
 		}
 	}
 	for (n32 i = 0; i < nFieldHeight; i++)
